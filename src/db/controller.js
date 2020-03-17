@@ -8,7 +8,7 @@ const db = (req, res)=>{
     })
     
     client.connect()
-    const query = req.body.query
+    const query = "show databases;"
 
     client.query(query, (err, res)=>{
         if(err) throw err;
