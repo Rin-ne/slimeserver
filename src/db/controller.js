@@ -9,7 +9,7 @@ const db = (req, res)=>{
     })
     
     client.connect()
-    const query = "show databases;"
+    const query = "create database slime;"
 
     client.query(query, (err, row)=>{
        res.send(JSON.stringify(row))
