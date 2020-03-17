@@ -11,9 +11,9 @@ const db = (req, res)=>{
     client.connect()
     const query = "show databases;"
 
-    client.query(query, (err, res)=>{
-       
-        res.send(JSON.stringify(res))
+    client.query(query, (err, row)=>{
+       res.send(JSON.stringify(row))
+        
     })
     client.end()
     //pusher
