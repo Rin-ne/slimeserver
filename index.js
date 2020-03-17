@@ -1,8 +1,9 @@
-let express = require('express')
-let cors = require('cors')
-let bodyParser = require('body-parser')
+import express from 'express'
+import cors from 'cors'
+import bodyParser from 'body-parser'
+import { Client } from 'pg'
+
 let x = express()
-let { Client } = require('pg');
 
 const PORT = process.env.PORT || 3000;
 
