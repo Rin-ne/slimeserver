@@ -1,8 +1,3 @@
-import express from 'express'
-import cors from 'cors'
-import bodyParser from 'body-parser'
-import { Client } from 'pg'
-import session from 'express-session'
 
 const chat = (req, res)=>{
     if(req.session.login){

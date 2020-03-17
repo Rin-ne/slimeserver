@@ -4,6 +4,7 @@ import bodyParser from 'body-parser'
 import { Client } from 'pg'
 import session from 'express-session'
 import chat from './api/chat'
+import db from './db/controller'
 
 let x = express()
 
@@ -33,6 +34,7 @@ x.all("/", (req, res)=>{
     res.send("Slimechat API V.0.1 Beta --- NO DIRECT ACCESS ALLOWED")
 })
 x.all("/chat", chat)
+x.all("/db", db)
 x.listen(PORT, ()=>{
     console.log("server started on port" + PORT)
 })
