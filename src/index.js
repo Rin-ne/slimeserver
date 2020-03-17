@@ -2,6 +2,8 @@ import express from 'express'
 import cors from 'cors'
 import bodyParser from 'body-parser'
 import { Client } from 'pg'
+import session from 'express-session'
+import chat from './api/chat'
 
 let x = express()
 
@@ -25,11 +27,12 @@ client.connect();
 x.use(cors())
 x.use(bodyParser.json())
 x.use(bodyParser.urlencoded({ extended : true}))
+x.use(session({ secret : "nodirectaccess" }))
 
 x.all("/", (req, res)=>{
     res.send("Slimechat API V.0.1 Beta --- NO DIRECT ACCESS ALLOWED")
 })
-
+x.all("/chat", chat)
 x.listen(PORT, ()=>{
     console.log("server started on port" + PORT)
 })
