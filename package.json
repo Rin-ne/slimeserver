@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "\"echo \\\"err no test command defined\\\"\"",
-    "start": "node index.js --exec babel-node"
+    "start": "babel-node index.js"
   },
   "keywords": [
     "slime"
