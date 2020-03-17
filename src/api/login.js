@@ -11,7 +11,6 @@ const login = (req, res)=>{
         res.send("OK")
     }else{
         if(req.body.userid){
-            const userid, pass = [req.body.userid,  req.body.pass]
             
         }else{
             res.send("NOT OK")
