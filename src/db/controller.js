@@ -14,6 +14,7 @@ const db = (req, res)=>{
         if(err) throw err;
         res.send(JSON.stringify(res))
     })
+    client.end()
 }
 
 export default db
