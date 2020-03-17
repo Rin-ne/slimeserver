@@ -7,4 +7,4 @@ x.all("/", (req, res)=>{
     res.send("Slimechat API V.0.1 Beta --- NO DIRECT ACCESS ALLOWED")
 })
 
-x.listen(80, 'localhost')
+x.listen(80, 'slimeserver.herokuapp.com')
