@@ -11,7 +11,7 @@ const db = (req, res)=>{
     const query = "show databases;"
 
     client.query(query, (err, res)=>{
-        if(err) throw err;
+        if (err) throw err;
         res.send(JSON.stringify(res))
     })
     client.end()
