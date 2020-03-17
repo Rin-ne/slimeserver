@@ -15,6 +15,7 @@ const db = (req, res)=>{
         res.send(JSON.stringify(res))
     })
     client.end()
+    //pusher
 }
 
 export default db
