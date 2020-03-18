@@ -4,13 +4,18 @@
 <body>
   <input id="x" type="text"/>
   <button onclick="send()">Send</button>
+  <p id="msg"></p>
   <script src="/socket.io/socket.io.js"></script>
   <script>
-    var socket = io('http://localhost');
+    var socket = io();
     const send = ()=>{
       let msg = document.getElementById("x").value
       socket.emit('chat message', msg);
     }
+    socket.on('msg', (msg)=>{
+      const m = document.querySelector("#msg")
+      m.innerHTML = m.innerHTML + "<br/>" + msg
+    })
   </script>
 </body>
 </html>
