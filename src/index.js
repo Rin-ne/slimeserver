@@ -1,40 +1,38 @@
 import express from 'express'
 import cors from 'cors'
-import bodyParser from 'body-parser'
-import { Client } from 'pg'
 import session from 'express-session'
 import chat from './api/chat'
-import db from './db/controller'
+import login from './api/login'
+import admin from './admin/main'
 
 let x = express()
+let http = require("http").createServer(x)
+var io = require('socket.io')(http);
 
-const PORT = process.env.PORT || 3000;
-
-const client = new Client({
-  connectionString: process.env.DATABASE_URL,
-  ssl: true,
-});
-
-client.connect();
-
-// client.query('SELECT table_schema,table_name FROM information_schema.tables;', (err, res) => {
-//   if (err) throw err;
-//   for (let row of res.rows) {
-//     console.log(JSON.stringify(row));
-//   }
-//   client.end();
-// });
+const PORT = process.env.PORT || 80;
 
 x.use(cors())
-x.use(bodyParser.json())
-x.use(bodyParser.urlencoded({ extended : true}))
 x.use(session({ secret : "nodirectaccess" }))
 
 x.all("/", (req, res)=>{
     res.send("Slimechat API V.0.1 Beta --- NO DIRECT ACCESS ALLOWED")
+    console.log(req.query.name)
 })
 x.all("/chat", chat)
-x.all("/db", db)
-x.listen(PORT, ()=>{
-    console.log("server started on port" + PORT)
+x.get("/login", login)
+x.get("/admin", admin)
+x.get("/test", (req, res)=>{
+  res.sendFile(__dirname + "/index.html")
+})
+io.on('connection', function(socket){
+  console.log('a user connected');
+  socket.on("disconnect", ()=>{
+    console.log("user mati")
+  })
+  socket.on('chat message', function(msg){
+    io.emit('msg', msg)
+  });
+});
+http.listen(PORT, ()=>{
+    console.log("server started on port " + PORT)
 })
