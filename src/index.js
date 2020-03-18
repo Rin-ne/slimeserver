@@ -20,7 +20,6 @@ x.all("/", (req, res)=>{
 })
 x.all("/chat", chat)
 x.get("/login", login)
-x.get("/admin", admin)
 x.get("/test", (req, res)=>{
   res.sendFile(__dirname + "/index.html")
 })
