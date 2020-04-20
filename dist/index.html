@@ -7,9 +7,11 @@
   <p id="msg"></p>
   <script src="/socket.io/socket.io.js"></script>
   <script>
+    window.username = prompt("Input your username")
     var socket = io();
     const send = ()=>{
       let msg = document.getElementById("x").value
+      msg = username + " : " + msg
       socket.emit('chat message', msg);
     }
     socket.on('msg', (msg)=>{

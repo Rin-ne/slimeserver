@@ -1,0 +1,18 @@
+[
+    {
+        "ip": "66.66.66.66",
+        "key": "value"
+    },
+    {
+        "ip": "::ffff:127.0.0.1",
+        "apikey": "U1B1wuXu8GWJDVHWIf3uJzF1L1lP9a7o"
+    },
+    {
+        "ip": "::ffff:127.0.0.1",
+        "apikey": "QBU2g2k2FTY6nOfOvgu6WsczJ9WbI2ta"
+    },
+    {
+        "ip": "::1",
+        "apikey": "1gyUNiOshD541qk1vjbN3re5wY9mDHWk"
+    }
+]
