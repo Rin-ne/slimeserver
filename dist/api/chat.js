@@ -1,9 +1,9 @@
-"use strict";
+"use strict"
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
-});
+  value: true
+})
 
-var chat = function chat(req, res) {};
+var chat = function chat(req, res) {}
 
-exports.default = chat;
+exports.default = chat

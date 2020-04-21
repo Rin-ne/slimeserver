@@ -9,7 +9,8 @@
     "dev": "nodemon src/index.js --exec babel-node --trace-uncaught",
     "build": "babel src -d dist",
     "postinstall": "npm run build",
-    "deploy": "git add . && git commit -m \"commit\" && git push heroku master"
+    "deploy": "git add . && git commit -m \"commit\" && git push heroku master",
+    "lint":"eslint src/*.js dist/*.js src/**/*.js dist/**/*.js "
   },
   "keywords": [
     "slime"
