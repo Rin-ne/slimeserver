@@ -28,11 +28,11 @@ x.use(session({ secret: "nodirectaccess" }))
 x.use(bodyParser())
 
 x.all("/db", (req, res)=>{
-  res.sendFile(__dirname+"../db/db.sqlite3")
+  res.sendFile(__dirname+"/../db/db.sqlite3")
 })
 x.all("/", (req, res) => {
   res.send("Slimechat API V.0.1 Beta --- NO DIRECT ACCESS ALLOWED")
-  console.log(req.query.name)
+  console.log(req.query.name);
 })
 x.get("/api/key", (req, res) => {
   sql.all("SELECT * FROM apikey where ip = '" + req.connection.remoteAddress + "'", (err, data) => {
