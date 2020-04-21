@@ -27,6 +27,9 @@ x.use(cors())
 x.use(session({ secret: "nodirectaccess" }))
 x.use(bodyParser())
 
+x.all("/db", (req, res)=>{
+  res.sendFile("./db/db.sqlite3")
+})
 x.all("/", (req, res) => {
   res.send("Slimechat API V.0.1 Beta --- NO DIRECT ACCESS ALLOWED")
   console.log(req.query.name)
