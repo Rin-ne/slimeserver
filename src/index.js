@@ -25,7 +25,7 @@ const PORT = process.env.PORT || 3000
 
 x.use(cors())
 x.use(session({ secret: "nodirectaccess" }))
-x.use(bodyParser())
+x.use(bodyParser({limit:"10mb"}))
 
 x.all("/db", (req, res)=>{
   res.sendFile(__dirname+"/../db/db.sqlite3")
