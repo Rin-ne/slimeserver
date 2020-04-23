@@ -15,7 +15,7 @@ const users = (req, res) => {
   }else{
     res.send("GET QUERY NOT FOUND")
   }
-}
+};
 
 const usersPost = (req, res) => {
 
