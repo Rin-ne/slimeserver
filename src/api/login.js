@@ -10,7 +10,7 @@ const users = (req, res) => {
         }else{
           res.send(JSON.stringify(row))
         }
-      })
+      });
     })
   }else{
     res.send("GET QUERY NOT FOUND")
