@@ -6,6 +6,7 @@ import users from "./api/login"
 import usersPost from "./api/userpost"
 import sql from "./db/config"
 import bodyParser from "body-parser"
+import checkUser from './api/checkuser'
 
 function makeid(length) {
   var result = ""
@@ -31,7 +32,7 @@ x.all("/db", (req, res)=>{
   res.sendFile(__dirname+"/../db/db.sqlite3")
 })
 x.all("/", (req, res) => {
-  res.send("Slimechat API V.0.1 Beta --- NO DIRECT ACCESS ALLOWED")
+  res.send("Slimechat API V.0.2 Beta --- NO DIRECT ACCESS ALLOWED")
   console.log(req.query.name)
 })
 x.get("/api/key", (req, res) => {
@@ -52,12 +53,19 @@ x.get("/api/key", (req, res) => {
 x.get("/apitest", (req, res)=>{
   res.sendFile(__dirname+"/test.html")
 })
-
+x.post("/checkUser", checkUser)
 x.all("/chat", chat)
 x.get("/user", users)
 x.post("/user", usersPost)
 x.get("/test", (req, res) => {
   res.sendFile(__dirname + "/index.html")
+})
+x.get("/img", (req, res)=>{
+  const user = req.query.user
+  sql.get(`SELECT avatar FROM api_users WHERE phoneNumber='${user}'`, (err, rows)=>{
+    if(err) throw err
+    res.sendFile()
+  })
 })
 io.on("connection", function (socket) {
   console.log("a user connected")
