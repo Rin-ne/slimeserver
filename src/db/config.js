@@ -5,5 +5,4 @@ let sql = new sqlite3.Database(DB, sqlite3.OPEN_READWRITE, (err) => {
   if(err) throw err
   console.log("Connected to database")
 })
-
 export default sql

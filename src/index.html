@@ -1,34 +1,49 @@
 <html>
+
 <head>
 </head>
+
 <body>
-  <input id="x" type="text"/>
-  <input id="y" type="text"/>
+  <input id="x" type="text" />
+  <input id="y" type="text" />
   <button onclick="send()">Send</button>
   <p id="msg"></p>
   <script src="/socket.io/socket.io.js"></script>
   <script>
-  fetch("/socket.io/socket.io.js").then((res)=>res.text()).then((res)=>console.log(res))
-  console.log(io)
+    fetch("/socket.io/socket.io.js").then((res) => res.text()).then((res) => console.log(res))
+    console.log(io)
     const username = prompt("Input your username")
     var socket = io();
+    socket.on("+6285544446666", (msg) => {
+      try {
+        msg = JSON.parse(msg)
+        let d = new Date()
+        console.log("got da message")
+        console.log(msg)
+        
+      }
+      catch (e) {
+        console.log(e)
+      }
+    })
     socket.emit("username", username)
-    const send = ()=>{
+    const send = () => {
       let msg = document.getElementById("x").value
       let raw = msg
       let to = document.getElementById("y").value
-      msg = to + "/@0!/213/"+ username + "/@0!/213/"  + msg
+      msg = to + "/@0!/213/" + username + "/@0!/213/" + msg
       socket.emit('chat message', msg);
       const m = document.querySelector("#msg")
-      m.innerHTML = m.innerHTML + "<br/>" + "you" +" : " +raw
+      m.innerHTML = m.innerHTML + "<br/>" + "you" + " : " + raw
     }
-    socket.on('msg;to='+username, (msg)=>{
+    socket.on('msg;to=' + username, (msg) => {
       const message = msg.split("/@0!/213/")[2]
       const from = msg.split("/@0!/213/")[1]
       const m = document.querySelector("#msg")
-      m.innerHTML = m.innerHTML + "<br/>" + from +" : " +message
+      m.innerHTML = m.innerHTML + "<br/>" + from + " : " + message
     })
 
   </script>
 </body>
+
 </html>
