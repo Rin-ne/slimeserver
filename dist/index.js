@@ -44,6 +44,10 @@ var _lodash = require("lodash");
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
+var _expressPing = require("express-ping");
+
+var _expressPing2 = _interopRequireDefault(_expressPing);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var MongoClient = _mongodb2.default.MongoClient;
@@ -52,7 +56,7 @@ var client = new MongoClient(uri, { useNewUrlParser: true });
 client.connect(function (err) {
   var collection = client.db("test").collection("devices");
   console.log("connected to mongo database");
-  // perform actions on the collection object
+  // perform actions on the collection object;;
   client.close();
 });
 
@@ -67,6 +71,7 @@ x.use((0, _expressSession2.default)({ secret: "nodirectaccess" }));
 x.use((0, _bodyParser2.default)({ limit: "10mb" }));
 x.use((0, _expressFileupload2.default)({ createParentPath: true }));
 x.use((0, _morgan2.default)('dev'));
+x.use(_expressPing2.default.ping());
 
 /**
  * index, not really important tho
