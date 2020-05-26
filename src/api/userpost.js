@@ -7,14 +7,14 @@ const usersPost = (req, res) => {
   const frontName = req.body.frontName
   const status = req.body.status
   console.log(avatar)
-  fs.writeFile(__dirname+"/../../img/"+frontName+".png", avatar, {encoding: "base64"}, function(err) {
+  fs.writeFile(__dirname+"/../../img/"+nomor+".png", avatar, {encoding: "base64"}, function(err) {
     console.log("File created")
   })
-  fs.writeFile(__dirname+"/../../img/"+frontName+".txt", avatar, ()=>{
+  fs.writeFile(__dirname+"/../../img/"+nomor+".txt", avatar, ()=>{
     
   })
   console.log(nomor)
-  const query = "INSERT INTO api_users(phoneNumber, name, avatar, status) VALUES('"+nomor+"', '"+frontName+"', '"+__dirname+"/../../img/"+frontName+".png"+"', '"+status+"')"
+  const query = "INSERT INTO api_users(phoneNumber, name, avatar, status) VALUES('"+nomor+"', '"+frontName+"', '"+__dirname+"/../../img/"+nomor+".png"+"', '"+status+"')"
   console.log(query)
   sql.run(query, (err)=>{
     if(err) throw err

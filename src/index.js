@@ -9,12 +9,14 @@ import mongodb from 'mongodb'
 import fileUpload from 'express-fileupload'
 import morgan from 'morgan'
 import _ from 'lodash'
+import multer from 'multer'
 import health from 'express-ping'
+import fs from 'fs'
 
 
 const MongoClient = mongodb.MongoClient
 const uri = "mongodb+srv://SlimeDev:a1s2h3j4a5@cluster0-qnvfk.mongodb.net/test?retryWrites=true&w=majority";
-const client = new MongoClient(uri, { useNewUrlParser: true });
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 client.connect(err => {
   const collection = client.db("test").collection("devices");
   console.log("connected to mongo database")
@@ -32,10 +34,34 @@ const PORT = process.env.PORT || 3000
 x.use(cors())
 x.use(session({ secret: "nodirectaccess" }))
 x.use(bodyParser({ limit: "10mb" }))
+x.use(bodyParser.urlencoded());
+x.use(bodyParser.urlencoded({ extended: true }));
 x.use(fileUpload({ createParentPath: true }));
 x.use(morgan('dev'));
 x.use(health.ping())
+health.info((data) => { console.log(data) })
 
+
+const Storage = multer.diskStorage({
+  destination: function (req, file, callback) {
+    callback(null, './img')
+  },
+  filename: function (req, file, callback) {
+    callback(null, `${file.fieldname}_${Date.now()}_${file.originalname}`)
+  },
+})
+
+const upload = multer({ storage: Storage }).single('file')
+x.post('/files', (req, res) => {
+  upload(req, res, err => {
+    if (err) console.error(err)
+    const file = req.file
+    const meta = req.body
+
+    console.log(file)
+    console.log(meta)
+  })
+})
 /**
  * index, not really important tho
  */
@@ -44,6 +70,16 @@ x.all("/", (req, res) => {
   console.log(req.query.name)
 })
 
+x.post("/up", (req, res) => {
+  const filename = req.body.filename
+  const file = req.body.file
+  var wstream = fs.createWriteStream(__dirname + "/../img/" + filename);
+  wstream.write(file);
+  wstream.end();
+})
+x.post("/uploadFile", (req, res) => {
+  console.log(req.body)
+})
 /**
  * Status handler, require api key and name query
  * Only get and post. After certain time the status will be deleted
@@ -53,7 +89,7 @@ x.all("/", (req, res) => {
  * it expect contactset query
  * return status thumbnail and state
  */
-x.get("/status", (req, res)=>{
+x.get("/status", (req, res) => {
   let data = req.body.data
   data = JSON.parse(data)
   if (!Array.isArray(data)) res.send("404")
@@ -65,11 +101,11 @@ x.get("/status", (req, res)=>{
  * return mp4 for video
  * return mp3 for audio
  */
-x.get("/status/:name", (req, res)=>{
+x.get("/status/:name", (req, res) => {
 
 })
-x.post("/status", (req, res)=>{
-  
+x.post("/status", (req, res) => {
+
 })
 /**
  * img handler. img received from /user post endpoint or daftar activity
@@ -113,8 +149,7 @@ io.on("connection", function (socket) {
     socket.on("disconnect", () => {
     })
     socket.on("chat", function (msg) {
-      try{
-
+      try {
         const data = JSON.parse(msg)
         console.log(msg)
         const d = {
@@ -124,8 +159,8 @@ io.on("connection", function (socket) {
           time: data.time
         }
         socket.broadcast.emit(data.receiver, JSON.stringify(d))
-      }catch(e){
-        
+      } catch (e) {
+
       }
     })
     socket.on("+6285710251303", (msg) => {

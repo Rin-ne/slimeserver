@@ -52,7 +52,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var MongoClient = _mongodb2.default.MongoClient;
 var uri = "mongodb+srv://SlimeDev:a1s2h3j4a5@cluster0-qnvfk.mongodb.net/test?retryWrites=true&w=majority";
-var client = new MongoClient(uri, { useNewUrlParser: true });
+var client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 client.connect(function (err) {
   var collection = client.db("test").collection("devices");
   console.log("connected to mongo database");
@@ -69,6 +69,8 @@ var PORT = process.env.PORT || 3000;
 x.use((0, _cors2.default)());
 x.use((0, _expressSession2.default)({ secret: "nodirectaccess" }));
 x.use((0, _bodyParser2.default)({ limit: "10mb" }));
+x.use(_bodyParser2.default.urlencoded());
+x.use(_bodyParser2.default.urlencoded({ extended: true }));
 x.use((0, _expressFileupload2.default)({ createParentPath: true }));
 x.use((0, _morgan2.default)('dev'));
 x.use(_expressPing2.default.ping());
@@ -81,6 +83,9 @@ x.all("/", function (req, res) {
   console.log(req.query.name);
 });
 
+x.post("/uploadFile", function (req, res) {
+  console.log(req.body);
+});
 /**
  * Status handler, require api key and name query
  * Only get and post. After certain time the status will be deleted
