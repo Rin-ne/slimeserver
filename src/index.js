@@ -73,7 +73,7 @@ x.all("/", (req, res) => {
 x.post("/up", (req, res) => {
   const filename = req.body.filename
   const file = req.body.file
-  var wstream = fs.createWriteStream(__dirname + "/../img/" + filename);
+  var wstream = fs.createWriteStream(__dirname + "/../img/" + filename, {encoding:'base64'});
   wstream.write(file);
   wstream.end();
 })
