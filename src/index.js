@@ -38,7 +38,7 @@ x.use(bodyParser.urlencoded());
 x.use(bodyParser.urlencoded({ extended: true }));
 x.use(fileUpload({ createParentPath: true }));
 x.use(morgan('dev'));
-x.use(health.ping())
+x.use(health.ping());
 health.info((data) => { console.log(data) })
 
 
