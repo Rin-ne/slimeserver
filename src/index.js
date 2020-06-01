@@ -28,7 +28,6 @@ client.connect(err => {
 let x = express()
 let http = require("http").createServer(x)
 var io = require("socket.io")(http)
-
 const PORT = process.env.PORT || 3000
 
 x.use(cors())
@@ -139,7 +138,15 @@ x.post("/user", usersPost)
 x.get("/test", (req, res) => {
   res.sendFile(__dirname + "/index.html")
 })
+let numberOFConnectedClient = 0
+x.get("/cn", (req, res)=>{
+  res.send(numberOFConnectedClient.toString())
+})
 io.on("connection", function (socket) {
+  numberOFConnectedClient++
+  socket.on("disconnect", ()=>{
+    numberOFConnectedClient--
+  })
   try {
     console.log("a user connected")
     console.log(socket.client.id)
