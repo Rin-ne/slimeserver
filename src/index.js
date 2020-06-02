@@ -161,7 +161,7 @@ ion.on("connection", function (socket) {
       clientData[socket.id].online = false
       onlineUser[clientData[socket.id].username] = false
     }catch(e){
-
+      console.log("disconnect faily")
     }
   })
   socket.on("username", (username) => {
@@ -192,7 +192,7 @@ ion.on("connection", function (socket) {
           }
           socket.broadcast.emit(data.receiver, JSON.stringify(d))
         } catch (e) {
-
+          console.log("failed to send msg")
         }
       }
       else{
