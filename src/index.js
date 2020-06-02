@@ -179,7 +179,7 @@ ion.on("connection", function (socket) {
     socket.on("disconnect", () => {
     })
     socket.on("chat", function (msg) {
-
+      console.log(onlineUser)
       if (onlineUser[msg.receiver] == true) {
         try {
           const data = JSON.parse(msg)
