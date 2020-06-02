@@ -171,7 +171,8 @@ io.on("connection", function (socket) {
     socket.on("disconnect", () => {
     })
     socket.on("chat", function (msg) {
-      if (clientData[socket.id].online == true) {
+
+      if (onlineUser[msg.receiver] == true) {
         try {
           const data = JSON.parse(msg)
           console.log(msg)
