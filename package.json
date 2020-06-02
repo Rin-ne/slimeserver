@@ -36,6 +36,7 @@
     "nodemon": "^2.0.2",
     "pg": "^7.18.2",
     "socket.io": "^2.3.0",
+    "socket.io-client": "^2.3.0",
     "sqlite3": "^4.1.1"
   },
   "devDependencies": {

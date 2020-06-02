@@ -44,9 +44,17 @@ var _lodash = require("lodash");
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
+var _multer = require("multer");
+
+var _multer2 = _interopRequireDefault(_multer);
+
 var _expressPing = require("express-ping");
 
 var _expressPing2 = _interopRequireDefault(_expressPing);
+
+var _fs = require("fs");
+
+var _fs2 = _interopRequireDefault(_fs);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -63,7 +71,6 @@ client.connect(function (err) {
 var x = (0, _express2.default)();
 var http = require("http").createServer(x);
 var io = require("socket.io")(http);
-
 var PORT = process.env.PORT || 3000;
 
 x.use((0, _cors2.default)());
@@ -74,7 +81,30 @@ x.use(_bodyParser2.default.urlencoded({ extended: true }));
 x.use((0, _expressFileupload2.default)({ createParentPath: true }));
 x.use((0, _morgan2.default)('dev'));
 x.use(_expressPing2.default.ping());
+_expressPing2.default.info(function (data) {
+  console.log(data);
+});
 
+var Storage = _multer2.default.diskStorage({
+  destination: function destination(req, file, callback) {
+    callback(null, './img');
+  },
+  filename: function filename(req, file, callback) {
+    callback(null, file.fieldname + "_" + Date.now() + "_" + file.originalname);
+  }
+});
+
+var upload = (0, _multer2.default)({ storage: Storage }).single('file');
+x.post('/files', function (req, res) {
+  upload(req, res, function (err) {
+    if (err) console.error(err);
+    var file = req.file;
+    var meta = req.body;
+
+    console.log(file);
+    console.log(meta);
+  });
+});
 /**
  * index, not really important tho
  */
@@ -83,6 +113,13 @@ x.all("/", function (req, res) {
   console.log(req.query.name);
 });
 
+x.post("/up", function (req, res) {
+  var filename = req.body.filename;
+  var file = req.body.file;
+  var wstream = _fs2.default.createWriteStream(__dirname + "/../img/" + filename, { encoding: 'base64' });
+  wstream.write(file);
+  wstream.end();
+});
 x.post("/uploadFile", function (req, res) {
   console.log(req.body);
 });
@@ -140,7 +177,26 @@ x.post("/user", _userpost2.default);
 x.get("/test", function (req, res) {
   res.sendFile(__dirname + "/index.html");
 });
+var numberOFConnectedClient = 0;
+var onlineUser = {};
+var clientData = {};
+x.get("/cn", function (req, res) {
+  res.send(numberOFConnectedClient.toString());
+});
 io.on("connection", function (socket) {
+  numberOFConnectedClient++;
+  socket.on("disconnect", function () {
+    numberOFConnectedClient--;
+    clientData[socket.id].online = false;
+    onlineUser[clientData[socket.id].username] = false;
+  });
+  socket.on("username", function (username) {
+    clientData[socket.id] = {
+      username: username,
+      online: true
+    };
+    onlineUser[username] = clientData[socket.id].online;
+  });
   try {
     console.log("a user connected");
     console.log(socket.client.id);
@@ -149,18 +205,20 @@ io.on("connection", function (socket) {
     });
     socket.on("disconnect", function () {});
     socket.on("chat", function (msg) {
-      try {
+      if (clientData[socket.id].online == true) {
 
-        var data = JSON.parse(msg);
-        console.log(msg);
-        var d = {
-          message: data.msg,
-          date: data.date,
-          sender: data.sender,
-          time: data.time
-        };
-        socket.broadcast.emit(data.receiver, JSON.stringify(d));
-      } catch (e) {}
+        try {
+          var data = JSON.parse(msg);
+          console.log(msg);
+          var d = {
+            message: data.msg,
+            date: data.date,
+            sender: data.sender,
+            time: data.time
+          };
+          socket.broadcast.emit(data.receiver, JSON.stringify(d));
+        } catch (e) {}
+      } else {}
     });
     socket.on("+6285710251303", function (msg) {
       console.log(msg);

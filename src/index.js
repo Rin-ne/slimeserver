@@ -12,6 +12,11 @@ import _ from 'lodash'
 import multer from 'multer'
 import health from 'express-ping'
 import fs from 'fs'
+import io from 'socket.io-client'
+
+const SocketNavy = io("http://localhost:3000")
+
+
 
 
 const MongoClient = mongodb.MongoClient
@@ -72,7 +77,7 @@ x.all("/", (req, res) => {
 x.post("/up", (req, res) => {
   const filename = req.body.filename
   const file = req.body.file
-  var wstream = fs.createWriteStream(__dirname + "/../img/" + filename, {encoding:'base64'});
+  var wstream = fs.createWriteStream(__dirname + "/../img/" + filename, { encoding: 'base64' });
   wstream.write(file);
   wstream.end();
 })
@@ -139,36 +144,50 @@ x.get("/test", (req, res) => {
   res.sendFile(__dirname + "/index.html")
 })
 let numberOFConnectedClient = 0
-x.get("/cn", (req, res)=>{
+let onlineUser = {}
+let clientData = {}
+x.get("/cn", (req, res) => {
   res.send(numberOFConnectedClient.toString())
 })
 io.on("connection", function (socket) {
-  console.log(io.sockets.clients())
   numberOFConnectedClient++
-  socket.on("disconnect", ()=>{
+  socket.on("disconnect", () => {
     numberOFConnectedClient--
+    clientData[socket.id].online = false
+    onlineUser[clientData[socket.id].username] = false
+  })
+  socket.on("username", (username) => {
+    clientData[socket.id] = {
+      username: username,
+      online: true
+    }
+    onlineUser[username] = clientData[socket.id].online
   })
   try {
     console.log("a user connected")
-    console.log(socket.client.id)
     socket.on("username", (username) => {
       socket.client.username = username
     })
     socket.on("disconnect", () => {
     })
     socket.on("chat", function (msg) {
-      try {
-        const data = JSON.parse(msg)
-        console.log(msg)
-        const d = {
-          message: data.msg,
-          date: data.date,
-          sender: data.sender,
-          time: data.time
-        }
-        socket.broadcast.emit(data.receiver, JSON.stringify(d))
-      } catch (e) {
+      if (clientData[socket.id].online == true) {
+        try {
+          const data = JSON.parse(msg)
+          console.log(msg)
+          const d = {
+            message: data.msg,
+            date: data.date,
+            sender: data.sender,
+            time: data.time
+          }
+          socket.broadcast.emit(data.receiver, JSON.stringify(d))
+        } catch (e) {
 
+        }
+      }
+      else{
+        SocketNavy.emit("store this chat please", {type:"object", data:msg})
       }
     })
     socket.on("+6285710251303", (msg) => {
