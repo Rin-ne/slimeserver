@@ -18,7 +18,6 @@ const SocketNavy = ioclient("http://localhost:3000")
 
 
 
-
 const MongoClient = mongodb.MongoClient
 const uri = "mongodb+srv://SlimeDev:a1s2h3j4a5@cluster0-qnvfk.mongodb.net/test?retryWrites=true&w=majority";
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -151,10 +150,19 @@ x.get("/cn", (req, res) => {
 })
 io.on("connection", function (socket) {
   numberOFConnectedClient++
+  setTimeout(()=>{
+    if(clientData[socket.id] == undefined){
+      socket.disconnect()
+    }
+  }, 5000)
   socket.on("disconnect", () => {
-    numberOFConnectedClient--
-    clientData[socket.id].online = false
-    onlineUser[clientData[socket.id].username] = false
+    try{
+      numberOFConnectedClient--
+      clientData[socket.id].online = false
+      onlineUser[clientData[socket.id].username] = false
+    }catch(e){
+
+    }
   })
   socket.on("username", (username) => {
     clientData[socket.id] = {
