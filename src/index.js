@@ -12,9 +12,9 @@ import _ from 'lodash'
 import multer from 'multer'
 import health from 'express-ping'
 import fs from 'fs'
-import io from 'socket.io-client'
+import ioclient from 'socket.io-client'
 
-const SocketNavy = io("http://localhost:3000")
+const SocketNavy = ioclient("http://localhost:3000")
 
 
 
