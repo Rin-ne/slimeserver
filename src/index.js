@@ -143,6 +143,7 @@ x.get("/cn", (req, res)=>{
   res.send(numberOFConnectedClient.toString())
 })
 io.on("connection", function (socket) {
+  console.log(io.sockets.clients())
   numberOFConnectedClient++
   socket.on("disconnect", ()=>{
     numberOFConnectedClient--
