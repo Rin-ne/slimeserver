@@ -153,6 +153,8 @@ ion.on("connection", function (socket) {
   setTimeout(()=>{
     if(clientData[socket.id] == undefined){
       socket.disconnect()
+    }else{
+      console.log("something bad happened")
     }
   }, 10000)
   socket.on("disconnect", () => {
