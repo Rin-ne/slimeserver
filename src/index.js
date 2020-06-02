@@ -196,6 +196,7 @@ ion.on("connection", function (socket) {
         }
       }
       else{
+        console.log("forwarded to navy")
         SocketNavy.emit("store this chat please", {type:"object", data:msg})
       }
     })
