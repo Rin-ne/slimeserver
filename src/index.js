@@ -12,9 +12,9 @@ import _ from 'lodash'
 import multer from 'multer'
 import health from 'express-ping'
 import fs from 'fs'
-import ioclient from 'socket.io-client'
+import io from 'socket.io-client'
 
-const SocketNavy = ioclient("http://localhost:3000")
+const SocketNavy = io("http://localhost:3000")
 
 
 
@@ -31,7 +31,7 @@ client.connect(err => {
 
 let x = express()
 let http = require("http").createServer(x)
-var io = require("socket.io")(http)
+var ion = require("socket.io")(http)
 const PORT = process.env.PORT || 3000
 
 x.use(cors())
@@ -133,7 +133,7 @@ x.get("/img/:name", (req, res) => {
  *  nomor : String
  *  avatar : String(base64)
  *  frontName : String
- *  status : String //it should be bio
+ *  status : String //it should be bion
  * }) 
  *
  */
@@ -148,7 +148,7 @@ let clientData = {}
 x.get("/cn", (req, res) => {
   res.send(numberOFConnectedClient.toString())
 })
-io.on("connection", function (socket) {
+ion.on("connection", function (socket) {
   numberOFConnectedClient++
   setTimeout(()=>{
     if(clientData[socket.id] == undefined){
