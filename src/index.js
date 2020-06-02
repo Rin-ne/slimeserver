@@ -154,7 +154,7 @@ ion.on("connection", function (socket) {
     if(clientData[socket.id] == undefined){
       socket.disconnect()
     }
-  }, 5000)
+  }, 10000)
   socket.on("disconnect", () => {
     try{
       numberOFConnectedClient--
