@@ -72,7 +72,6 @@ x.post('/files', (req, res) => {
  */
 x.all("/", (req, res) => {
   res.send("Slimechat API V.0.2 Beta --- NO DIRECT ACCESS ALLOWED")
-  console.log(req.query.name)
 })
 
 x.post("/up", (req, res) => {
