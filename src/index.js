@@ -14,24 +14,26 @@ import health from 'express-ping'
 import fs from 'fs'
 import io from 'socket.io-client'
 
-const SocketNavy = io("http://localhost:3000")
+const SocketNavy = io("http://sl-navy.herokuapp.com")
+const SocketAzure = io("http://sl-azure.herokuapp.com")
+const SocketCrimson = io("http://sl-crimson.herokuapp.com")
+const SocketFireBrick = io("http://sl-firebrick.herokuapp.com")
+const SocketMagenta = io("http://sl-magenta.herokuapp.com")
 
+const alfabet = ["a","2","e","1","f","4","d","5","c","6","a","9","d","0","b","3","6","c","8","c","4","c","1","b","a","5","e","3","1","5","6","7","1","4","5","b","e","f","f","f","1","3","4","7","9","a","e","1","d","b","2","6","b","7","7"]
+let users = {
 
-
-const MongoClient = mongodb.MongoClient
-const uri = "mongodb+srv://SlimeDev:a1s2h3j4a5@cluster0-qnvfk.mongodb.net/test?retryWrites=true&w=majority";
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-client.connect(err => {
-  const collection = client.db("test").collection("devices");
-  console.log("connected to mongo database")
-  // perform actions on the collection object;;
-  client.close();
-});
-
-
+}
+setInterval(()=>{
+  const time = `${new Date().getFullYear() * new Date().getSeconds()}${new Date().getDate()* new Date().getSeconds()}${new Date().getHours()* new Date().getSeconds()}${new Date().getMinutes()* new Date().getSeconds()}${new Date().getSeconds()* new Date().getSeconds()}`
+  let token = ""
+  time.split("").forEach(t=>{
+    token = token + alfabet[t]
+  })
+}, 10)
 let x = express()
 let http = require("http").createServer(x)
-var ion = require("socket.io")(http)
+var ion = require("socket.io")(http, { wsEngine: "ws" })
 const PORT = process.env.PORT || 3000
 
 x.use(cors())
@@ -150,19 +152,20 @@ x.get("/cn", (req, res) => {
 })
 ion.on("connection", function (socket) {
   numberOFConnectedClient++
-  setTimeout(()=>{
-    if(clientData[socket.id] == undefined){
+  const bomb = setTimeout(() => {
+    if (clientData[socket.id] == undefined) {
+      console.log(`${socket.id} is kicked`)
       socket.disconnect()
-    }else{
+    } else {
       console.log("something bad happened")
     }
-  }, 10000)
+  }, 30000)
   socket.on("disconnect", () => {
-    try{
+    try {
       numberOFConnectedClient--
       clientData[socket.id].online = false
       onlineUser[clientData[socket.id].username] = false
-    }catch(e){
+    } catch (e) {
       console.log("disconnect faily")
     }
   })
@@ -172,19 +175,19 @@ ion.on("connection", function (socket) {
       online: true
     }
     onlineUser[username] = clientData[socket.id].online
+    clearTimeout(bomb)
   })
   try {
     console.log("a user connected")
-    socket.on("username", (username) => {
-      socket.client.username = username
-    })
-    socket.on("disconnect", () => {
-    })
-    socket.on("chat", function (msg) {
+
+    socket.on("chat", function (msg, callback) {
       console.log(onlineUser)
-      if (onlineUser[msg.receiver] == true) {
-        try {
-          const data = JSON.parse(msg)
+      try {
+        msg = JSON.parse(msg)
+        console.log(msg.receiver)
+        console.log(onlineUser[msg.receiver])
+        if (onlineUser[msg.receiver] == true) {
+          const data = msg
           console.log(msg)
           const d = {
             message: data.msg,
@@ -193,13 +196,18 @@ ion.on("connection", function (socket) {
             time: data.time
           }
           socket.broadcast.emit(data.receiver, JSON.stringify(d))
-        } catch (e) {
-          console.log("failed to send msg")
+          callback("delivered")
         }
-      }
-      else{
-        console.log("forwarded to navy")
-        SocketNavy.emit("store this chat please", {type:"object", data:msg})
+        else {
+          console.log("forwarded to navy")
+          SocketNavy.emit("store this chat please", { type: "object", data: msg })
+          callback("sent")
+        }
+      } catch (e) {
+        console.log("failed to send msg\nproblem : "+e)
+        try{
+          callback("failed")
+        }catch(e){}
       }
     })
     socket.on("+6285710251303", (msg) => {

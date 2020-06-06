@@ -56,21 +56,17 @@ var _fs = require("fs");
 
 var _fs2 = _interopRequireDefault(_fs);
 
+var _socket = require("socket.io-client");
+
+var _socket2 = _interopRequireDefault(_socket);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var MongoClient = _mongodb2.default.MongoClient;
-var uri = "mongodb+srv://SlimeDev:a1s2h3j4a5@cluster0-qnvfk.mongodb.net/test?retryWrites=true&w=majority";
-var client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-client.connect(function (err) {
-  var collection = client.db("test").collection("devices");
-  console.log("connected to mongo database");
-  // perform actions on the collection object;;
-  client.close();
-});
+var SocketNavy = (0, _socket2.default)("http://localhost:4000");
 
 var x = (0, _express2.default)();
 var http = require("http").createServer(x);
-var io = require("socket.io")(http);
+var ion = require("socket.io")(http, { wsEngine: "ws" });
 var PORT = process.env.PORT || 3000;
 
 x.use((0, _cors2.default)());
@@ -168,7 +164,7 @@ x.get("/img/:name", function (req, res) {
  *  nomor : String
  *  avatar : String(base64)
  *  frontName : String
- *  status : String //it should be bio
+ *  status : String //it should be bion
  * }) 
  *
  */
@@ -183,12 +179,24 @@ var clientData = {};
 x.get("/cn", function (req, res) {
   res.send(numberOFConnectedClient.toString());
 });
-io.on("connection", function (socket) {
+ion.on("connection", function (socket) {
   numberOFConnectedClient++;
+  var bomb = setTimeout(function () {
+    if (clientData[socket.id] == undefined) {
+      console.log(socket.id + " is kicked");
+      socket.disconnect();
+    } else {
+      console.log("something bad happened");
+    }
+  }, 30000);
   socket.on("disconnect", function () {
-    numberOFConnectedClient--;
-    clientData[socket.id].online = false;
-    onlineUser[clientData[socket.id].username] = false;
+    try {
+      numberOFConnectedClient--;
+      clientData[socket.id].online = false;
+      onlineUser[clientData[socket.id].username] = false;
+    } catch (e) {
+      console.log("disconnect faily");
+    }
   });
   socket.on("username", function (username) {
     clientData[socket.id] = {
@@ -196,19 +204,19 @@ io.on("connection", function (socket) {
       online: true
     };
     onlineUser[username] = clientData[socket.id].online;
+    clearTimeout(bomb);
   });
   try {
     console.log("a user connected");
-    console.log(socket.client.id);
-    socket.on("username", function (username) {
-      socket.client.username = username;
-    });
-    socket.on("disconnect", function () {});
-    socket.on("chat", function (msg) {
-      if (clientData[socket.id].online == true) {
 
+    socket.on("chat", function (msg, callback) {
+      console.log(onlineUser);
+      msg = JSON.parse(msg);
+      console.log(msg.receiver);
+      console.log(onlineUser[msg.receiver]);
+      if (onlineUser[msg.receiver] == true) {
         try {
-          var data = JSON.parse(msg);
+          var data = msg;
           console.log(msg);
           var d = {
             message: data.msg,
@@ -217,8 +225,16 @@ io.on("connection", function (socket) {
             time: data.time
           };
           socket.broadcast.emit(data.receiver, JSON.stringify(d));
-        } catch (e) {}
-      } else {}
+          callback("delivered");
+        } catch (e) {
+          console.log("failed to send msg");
+          callback("failed");
+        }
+      } else {
+        console.log("forwarded to navy");
+        SocketNavy.emit("store this chat please", { type: "object", data: msg });
+        callback("sent");
+      }
     });
     socket.on("+6285710251303", function (msg) {
       console.log(msg);
