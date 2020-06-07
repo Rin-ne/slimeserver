@@ -204,7 +204,7 @@ ion.on("connection", function (socket) {
         const msg = JSON.parse(data)
         console.log(msg.receiver)
         console.log(onlineUser[msg.receiver])
-        if (onlineUser[msg.receiver] == true) {
+        if (onlineUser[msg.receiver] === true) {
           const data = msg
           console.log(msg)
           const d = {
@@ -217,7 +217,7 @@ ion.on("connection", function (socket) {
           callback("delivered")
         }
         else {
-          if (users[msg.receiver] != undefined) {
+          if (users[msg.receiver] !== undefined) {
             switch (users[msg.receiver]) {
               case server["azure"]:
                 ServerSockets.azure.emit("chat", data)
@@ -236,7 +236,7 @@ ion.on("connection", function (socket) {
             }
           }
           console.log("forwarded to navy")
-          SocketNavy.emit("store this chat please", { type: "object", data: msg })
+          ServerSockets.navy.emit("store this chat please", { type: "object", data: msg })
           callback("sent")
         }
       } catch (e) {
