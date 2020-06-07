@@ -62,8 +62,35 @@ var _socket2 = _interopRequireDefault(_socket);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var SocketNavy = (0, _socket2.default)("http://localhost:4000");
+var server = {
+  "azure": "http://sl-azure.herokuapp.com",
+  "crimson": "http://sl-crimson.herokuapp.com",
+  "firebrick": "http://sl-firebrick.herokuapp.com",
+  "magenta": "http://sl-magenta.herokuapp.com",
+  "navy": "http://sl-navy.herokuapp.com",
+  "linen": "http://sl-linen.herokuapp.com",
+  "thistle": "http://sl-thistle.herokuapp.com",
+  "aliceblue": "http://sl-aliceblue.herokuapp.com",
+  "sienna": "http://sl-sienna.herokuapp.com",
+  "ivory": "http://sl-ivory.herokuapp.com"
+};
 
+var SocketNavy = (0, _socket2.default)(server["navy"]);
+var SocketAzure = (0, _socket2.default)(server["azure"]);
+var SocketCrimson = (0, _socket2.default)(server["crimson"]);
+var SocketFireBrick = (0, _socket2.default)(server["firebrick"]);
+var SocketMagenta = (0, _socket2.default)(server["magenta"]);
+
+var alfabet = ["a", "2", "e", "1", "f", "4", "d", "5", "c", "6", "a", "9", "d", "0", "b", "3", "6", "c", "8", "c", "4", "c", "1", "b", "a", "5", "e", "3", "1", "5", "6", "7", "1", "4", "5", "b", "e", "f", "f", "f", "1", "3", "4", "7", "9", "a", "e", "1", "d", "b", "2", "6", "b", "7", "7"];
+var users = {};
+setInterval(function () {
+  var time = "" + new Date().getFullYear() * new Date().getSeconds() + new Date().getDate() * new Date().getSeconds() + new Date().getHours() * new Date().getSeconds() + new Date().getMinutes() * new Date().getSeconds() + new Date().getSeconds() * new Date().getSeconds();
+  var token = "";
+  time.split("").forEach(function (t) {
+    token = token + alfabet[t];
+  });
+  fetch(server["aliceblue"] + "/user?token=" + token).then(function () {});
+}, 10);
 var x = (0, _express2.default)();
 var http = require("http").createServer(x);
 var ion = require("socket.io")(http, { wsEngine: "ws" });
@@ -106,7 +133,6 @@ x.post('/files', function (req, res) {
  */
 x.all("/", function (req, res) {
   res.send("Slimechat API V.0.2 Beta --- NO DIRECT ACCESS ALLOWED");
-  console.log(req.query.name);
 });
 
 x.post("/up", function (req, res) {
@@ -211,11 +237,11 @@ ion.on("connection", function (socket) {
 
     socket.on("chat", function (msg, callback) {
       console.log(onlineUser);
-      msg = JSON.parse(msg);
-      console.log(msg.receiver);
-      console.log(onlineUser[msg.receiver]);
-      if (onlineUser[msg.receiver] == true) {
-        try {
+      try {
+        msg = JSON.parse(msg);
+        console.log(msg.receiver);
+        console.log(onlineUser[msg.receiver]);
+        if (onlineUser[msg.receiver] == true) {
           var data = msg;
           console.log(msg);
           var d = {
@@ -226,14 +252,16 @@ ion.on("connection", function (socket) {
           };
           socket.broadcast.emit(data.receiver, JSON.stringify(d));
           callback("delivered");
-        } catch (e) {
-          console.log("failed to send msg");
-          callback("failed");
+        } else {
+          console.log("forwarded to navy");
+          SocketNavy.emit("store this chat please", { type: "object", data: msg });
+          callback("sent");
         }
-      } else {
-        console.log("forwarded to navy");
-        SocketNavy.emit("store this chat please", { type: "object", data: msg });
-        callback("sent");
+      } catch (e) {
+        console.log("failed to send msg\nproblem : " + e);
+        try {
+          callback("failed");
+        } catch (e) {}
       }
     });
     socket.on("+6285710251303", function (msg) {

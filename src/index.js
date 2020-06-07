@@ -5,36 +5,55 @@ import usersPost from "./api/userpost"
 import bodyParser from "body-parser"
 import checkUser from './api/checkuser'
 import path from 'path'
-import mongodb from 'mongodb'
 import fileUpload from 'express-fileupload'
 import morgan from 'morgan'
-import _ from 'lodash'
 import multer from 'multer'
 import health from 'express-ping'
 import fs from 'fs'
+import fetch from 'node-fetch'
 import io from 'socket.io-client'
 
-const SocketNavy = io("http://sl-navy.herokuapp.com")
-const SocketAzure = io("http://sl-azure.herokuapp.com")
-const SocketCrimson = io("http://sl-crimson.herokuapp.com")
-const SocketFireBrick = io("http://sl-firebrick.herokuapp.com")
-const SocketMagenta = io("http://sl-magenta.herokuapp.com")
+const server = {
+  "azure": "http://sl-azure.herokuapp.com",
+  "crimson": "http://sl-crimson.herokuapp.com",
+  "firebrick": "http://sl-firebrick.herokuapp.com",
+  "magenta": "http://sl-magenta.herokuapp.com",
+  "navy": "http://sl-navy.herokuapp.com",
+  "linen": "http://sl-linen.herokuapp.com",
+  "thistle": "http://sl-thistle.herokuapp.com",
+  "aliceblue": "http://sl-aliceblue.herokuapp.com",
+  "sienna": "http://sl-sienna.herokuapp.com",
+  "ivory": "http://sl-ivory.herokuapp.com"
+}
+const ServerSockets = {
+  navy: io(server["navy"]),
+  azure: io(server["azure"]),
+  crimson: io(server["crimson"]),
+  firebrick: io(server["firebrick"]),
+  magenta: io(server["magenta"])
+}
 
-const alfabet = ["a","2","e","1","f","4","d","5","c","6","a","9","d","0","b","3","6","c","8","c","4","c","1","b","a","5","e","3","1","5","6","7","1","4","5","b","e","f","f","f","1","3","4","7","9","a","e","1","d","b","2","6","b","7","7"]
+const alfabet = ["a", "2", "e", "1", "f", "4", "d", "5", "c", "6", "a", "9", "d", "0", "b", "3", "6", "c", "8", "c", "4", "c", "1", "b", "a", "5", "e", "3", "1", "5", "6", "7", "1", "4", "5", "b", "e", "f", "f", "f", "1", "3", "4", "7", "9", "a", "e", "1", "d", "b", "2", "6", "b", "7", "7"]
 let users = {
 
 }
-setInterval(()=>{
-  const time = `${new Date().getFullYear() * new Date().getSeconds()}${new Date().getDate()* new Date().getSeconds()}${new Date().getHours()* new Date().getSeconds()}${new Date().getMinutes()* new Date().getSeconds()}${new Date().getSeconds()* new Date().getSeconds()}`
+setInterval(() => {
+  const time = `${new Date().getFullYear() * new Date().getSeconds()}${new Date().getDate() * new Date().getSeconds()}${new Date().getHours() * new Date().getSeconds()}${new Date().getMinutes() * new Date().getSeconds()}${new Date().getSeconds() * new Date().getSeconds()}`
   let token = ""
-  time.split("").forEach(t=>{
+  time.split("").forEach(t => {
     token = token + alfabet[t]
   })
+  fetch(server["aliceblue"] + "/user?token=" + token)
+    .then((data) => data.json())
+    .then(data => {
+      users = data
+    })
+    .catch(e => { })
 }, 10)
 let x = express()
 let http = require("http").createServer(x)
-var ion = require("socket.io")(http, { wsEngine: "ws" })
-const PORT = process.env.PORT || 3000
+let ion = require("socket.io")(http, { wsEngine: "ws" })
+const PORT = process.env.PORT || 7002
 
 x.use(cors())
 x.use(session({ secret: "nodirectaccess" }))
@@ -152,7 +171,7 @@ x.get("/cn", (req, res) => {
 ion.on("connection", function (socket) {
   numberOFConnectedClient++
   const bomb = setTimeout(() => {
-    if (clientData[socket.id] == undefined) {
+    if (onlineUser[socket.id] === undefined) {
       console.log(`${socket.id} is kicked`)
       socket.disconnect()
     } else {
@@ -179,10 +198,10 @@ ion.on("connection", function (socket) {
   try {
     console.log("a user connected")
 
-    socket.on("chat", function (msg, callback) {
+    socket.on("chat", function (data, callback) {
       console.log(onlineUser)
       try {
-        msg = JSON.parse(msg)
+        const msg = JSON.parse(data)
         console.log(msg.receiver)
         console.log(onlineUser[msg.receiver])
         if (onlineUser[msg.receiver] == true) {
@@ -198,15 +217,33 @@ ion.on("connection", function (socket) {
           callback("delivered")
         }
         else {
+          if (users[msg.receiver] != undefined) {
+            switch (users[msg.receiver]) {
+              case server["azure"]:
+                ServerSockets.azure.emit("chat", data)
+                break
+              case server["firebrick"]:
+                ServerSockets.firebrick.emit("chat", data)
+                break
+              case server["crimson"]:
+                ServerSockets.crimson.emit("chat", data)
+                break
+              case server["magenta"]:
+                ServerSockets.magenta.emit("chat", data)
+                break
+              default:
+                break;
+            }
+          }
           console.log("forwarded to navy")
           SocketNavy.emit("store this chat please", { type: "object", data: msg })
           callback("sent")
         }
       } catch (e) {
-        console.log("failed to send msg\nproblem : "+e)
-        try{
+        console.log("failed to send msg\nproblem : " + e)
+        try {
           callback("failed")
-        }catch(e){}
+        } catch (e) { }
       }
     })
     socket.on("+6285710251303", (msg) => {
