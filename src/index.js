@@ -32,7 +32,10 @@ const ServerSockets = {
   firebrick: io(server["firebrick"]),
   magenta: io(server["magenta"])
 }
+/*
 
+
+ */
 const alfabet = ["a", "2", "e", "1", "f", "4", "d", "5", "c", "6", "a", "9", "d", "0", "b", "3", "6", "c", "8", "c", "4", "c", "1", "b", "a", "5", "e", "3", "1", "5", "6", "7", "1", "4", "5", "b", "e", "f", "f", "f", "1", "3", "4", "7", "9", "a", "e", "1", "d", "b", "2", "6", "b", "7", "7"]
 let users = {
 
