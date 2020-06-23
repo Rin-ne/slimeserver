@@ -43,17 +43,17 @@ export default function checkUser(req, res) {
       avatar : ".",
       status : "Saya Slime",
       el : {
-        name:"SlimeChat"
+        name:"Slime Indonesia"
       }
     })
     friends.push({
       id : 57,
       phoneNumber:"+6289517148350",
       name : "Anggita P. Lesmana",
-      status:"CEO and Co Founder Slime Chat",
+      status:"CEO Slime Indonesia",
       avatar:".",
       el:{
-        name : "Anggita"
+        name : "Anggita Lesmana"
       }
     })
     res.send(JSON.stringify(friends))
