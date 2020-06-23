@@ -15,7 +15,6 @@ export default function checkUser(req, res) {
           if (row) {
             friends.forEach((le)=>{
               if(row != null && el != null){
-
                 if(row.phoneNumber == le.phoneNumber){
                   row = null
                   el = null
@@ -37,7 +36,28 @@ export default function checkUser(req, res) {
     
   })
   test(data).then(()=>{
+    friends.push({
+      id:666,
+      phoneNumber:"+6667778889990",
+      name : "Slime Indonesia",
+      avatar : ".",
+      status : "Saya Slime",
+      el : {
+        name:"SlimeChat"
+      }
+    })
+    friends.push({
+      id : 57,
+      phoneNumber:"+6289517148350",
+      name : "Anggita P. Lesmana",
+      status:"CEO and Co Founder Slime Chat",
+      avatar:".",
+      el:{
+        name : "Anggita"
+      }
+    })
     res.send(JSON.stringify(friends))
+    
   })
   
 }
