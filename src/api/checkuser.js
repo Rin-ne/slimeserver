@@ -43,7 +43,8 @@ export default function checkUser(req, res) {
       avatar : ".",
       status : "Saya Slime",
       el : {
-        name:"Slime Indonesia"
+        name:"Slime Indonesia",
+        number : "+6667778889990"
       }
     })
     friends.push({
@@ -53,7 +54,8 @@ export default function checkUser(req, res) {
       status:"CEO Slime Indonesia",
       avatar:".",
       el:{
-        name : "Anggita Lesmana"
+        name : "Anggita Lesmana",
+        number: "+6289517148350",
       }
     })
     res.send(JSON.stringify(friends))
