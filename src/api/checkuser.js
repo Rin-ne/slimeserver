@@ -49,13 +49,13 @@ export default function checkUser(req, res) {
     })
     friends.push({
       id : 57,
-      phoneNumber:"+6289517148350",
+      phoneNumber:"+6290517148350",
       name : "Anggita P. Lesmana",
       status:"CEO Slime Indonesia",
       avatar:".",
       el:{
         name : "Anggita Lesmana",
-        number: "+6289517148350",
+        number: "+6290517148350",
       }
     })
     res.send(JSON.stringify(friends))
