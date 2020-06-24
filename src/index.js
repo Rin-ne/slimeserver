@@ -211,7 +211,7 @@ ion.on("connection", function (socket) {
           const data = msg
           console.log(msg)
           const d = {
-            message: data.msg,
+            message: data.message,
             date: data.date,
             sender: data.sender,
             time: data.time
