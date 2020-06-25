@@ -18,7 +18,9 @@ const usersPost = (req, res) => {
   console.log(query)
   sql.run(query, (err)=>{
     if(err) throw err
-    res.send("User Created")
+    else{
+      res.send("User Created")
+    }
   })
 }
 
