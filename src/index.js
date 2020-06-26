@@ -196,6 +196,7 @@ ion.on("connection", function (socket) {
       online: true
     }
     onlineUser[username] = clientData[socket.id].online
+    console.log(username + " is online")
     clearTimeout(bomb)
   })
   try {

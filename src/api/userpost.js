@@ -6,12 +6,8 @@ const usersPost = (req, res) => {
   const avatar = req.body.avatar
   const frontName = req.body.frontName
   const status = req.body.status
-  console.log(avatar)
   fs.writeFile(__dirname+"/../../img/"+nomor+".png", avatar, {encoding: "base64"}, function(err) {
     console.log("File created")
-  })
-  fs.writeFile(__dirname+"/../../img/"+nomor+".txt", avatar, ()=>{
-    
   })
   console.log(nomor)
   const query = "INSERT INTO api_users(phoneNumber, name, avatar, status) VALUES('"+nomor+"', '"+frontName+"', '"+__dirname+"/../../img/"+nomor+".png"+"', '"+status+"')"
