@@ -186,6 +186,7 @@ ion.on("connection", function (socket) {
       numberOFConnectedClient--
       clientData[socket.id].online = false
       onlineUser[clientData[socket.id].username] = false
+      console.log(clientData[socket.id].username + " is disconnected")
     } catch (e) {
       console.log("disconnect faily")
     }
@@ -196,7 +197,7 @@ ion.on("connection", function (socket) {
       online: true
     }
     onlineUser[username] = clientData[socket.id].online
-    console.log(username + " is online")
+    console.log(username + " connected")
     clearTimeout(bomb)
   })
   try {

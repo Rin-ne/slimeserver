@@ -68,7 +68,7 @@
             }
         }
         customElements.define('hello-world', HelloWorld)
-        const socket = io("http://slimeserver.herokuapp.com")
+        const socket = io("http://localhost:7002")
         socket.emit("username", "+6287782705933")
         document.getElementsByTagName("p")[0].innerHTML = document.getElementsByTagName("p")[0].innerHTML + "Sending File..."
 
