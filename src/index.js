@@ -1,6 +1,6 @@
 import express from "express"
 import cors from "cors"
-import session from "express-session"
+import session, { Store } from "express-session"
 import usersPost from "./api/userpost"
 import bodyParser from "body-parser"
 import checkUser from './api/checkuser'
@@ -11,7 +11,77 @@ import multer from 'multer'
 import health from 'express-ping'
 import fs from 'fs'
 import fetch from 'node-fetch'
+import storage from "node-persist"
 import io from 'socket.io-client'
+import sql from './db/config'
+import { TransactionDatabase } from 'sqlite3-transactions'
+import * as admin from 'firebase-admin'
+const conf = require("../project1-be14c-firebase-adminsdk-rauno-946539cde6.json")
+let tokens = {}
+storage.init().then(() => {
+  storage.getItem("tokens").then((tokenss) => {
+    if(tokenss === undefined){
+      console.log("empty tokens")
+      return
+    }
+    console.log(tokenss)
+    tokens = JSON.parse(tokenss)
+  })
+})
+
+
+const setTokens = (nomor, token) => {
+  try{
+
+    tokens[nomor] = token
+    storage.setItem("tokens", JSON.stringify(tokens))
+    console.log(tokens)
+  }catch(e){
+    console.log("something wrong happened, or token is already in server")
+  }
+}
+const db = new TransactionDatabase(sql)
+db.beginTransaction((err, tx) => {
+  tx.run(`CREATE TABLE IF NOT EXISTS groups(
+    id	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+    name TEXT NOT NULL,
+    admin TEXT NOT NULL,
+    dateCreated TEXT NOT NULL,
+    description TEXT NOT NULL,
+    profilPictures TEXT NOT NULL,
+    members TEXT NOT NULL
+  )`)
+   tx.run(`CREATE TABLE IF NOT EXISTS stickers(
+    id	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+    name TEXT NOT NULL,
+    creator TEXT NOT NULL,
+    dateCreated TEXT NOT NULL,
+    description TEXT NOT NULL,
+    stickers TEXT NOT NULL,
+    packs TEXT NOT NULL
+  )`)
+
+  tx.commit((err) => {
+    if (err) return console.log(err)
+    console.log("hippity hoppity your code is now my property")
+  })
+})
+
+const getGroupInfo = async()=>{
+  return sql.serialize(()=>{
+    return sql.all(`SELECT * FROM groups`, [], (err, rows)=>{
+      return rows
+    })
+  })
+}
+admin.initializeApp({
+  credential: admin.credential.cert(conf),
+  databaseURL: "https://project1-be14c.firebaseio.com"
+
+})
+db.serialize(() => {
+  db.run
+})
 
 const server = {
   "azure": "http://sl-azure.herokuapp.com",
@@ -36,6 +106,7 @@ const ServerSockets = {
 
 
  */
+let pushNotifTokens = {}
 const alfabet = ["a", "2", "e", "1", "f", "4", "d", "5", "c", "6", "a", "9", "d", "0", "b", "3", "6", "c", "8", "c", "4", "c", "1", "b", "a", "5", "e", "3", "1", "5", "6", "7", "1", "4", "5", "b", "e", "f", "f", "f", "1", "3", "4", "7", "9", "a", "e", "1", "d", "b", "2", "6", "b", "7", "7"]
 let users = {
 
@@ -92,6 +163,56 @@ x.post('/files', (req, res) => {
 /**
  * index, not really important tho
  */
+x.get("/sendToken", (req, res) => {
+  let token, nomor
+  try {
+    token = req.query.token
+    nomor = req.query.nomor
+  } catch (e) {
+    res.send("Wrong Query")
+  }
+  setTokens(nomor, token)
+  res.send("ok")
+})
+x.post("/addSticker", (req, res) => {
+  if(req.body.nomor === undefined) return res.send("wrong query")
+  if(req.body.name === undefined) return res.send("wrong query")
+  if(req.body.sticker === undefined) return res.send("wrong query")
+  if(req.body.publish === undefined) return res.send("wrong query")
+  if(req.body.name === undefined) return res.send("wrong query")
+ // add sticker to host and send ok response 
+
+})
+x.get("/sticker/:id", (req, res) => {
+  
+})
+x.get("/sendNotif", (req, res) => {
+  try {
+    let nomor
+    nomor = req.query.nomor
+    console.log(tokens[nomor])
+    admin.messaging().sendToDevice(
+      tokens[nomor],
+      {
+        data: {
+          nomor: nomor
+        },
+      },
+      {
+        // Required for background/quit data-only messages on iOS
+        contentAvailable: true,
+        // Required for background/quit data-only messages on Android
+        priority: 'high',
+      },
+    ).then(()=>{
+      res.send("ok")
+    })
+  } catch (e) {
+    console.log(e)
+    return res.send("Wrong Query")
+  }
+})
+
 x.all("/", (req, res) => {
   res.send("Slimechat API V.0.2 Beta --- NO DIRECT ACCESS ALLOWED")
 })
@@ -105,6 +226,40 @@ x.post("/up", (req, res) => {
 })
 x.post("/uploadFile", (req, res) => {
   console.log(req.body)
+})
+const dn = ()=>{}
+x.post("/group", (req, res)=>{
+  if(
+    req.body.name === undefined||
+    req.body.admin === undefined||
+    req.body.profilePhoto === undefined||
+    req.body.members === undefined||
+    req.body.description === undefined
+  ){
+    return res.send("Wrong Query")
+  }
+  if(typeof req.body.admin == "string"){
+    req.body.admin = JSON.parse(req.body.admin)
+  }
+  const name = req.body.name,
+        admin = req.body.admin,
+        profilePhoto = req.body.profilePhoto,
+        members = req.body.members,
+        description = req.body.description,
+        d = new Date(),
+        createdDate = d.getUTCFullYear() + "-" + d.getUTCMonth() + "-" + d.getUTCDate() + " " + d.getUTCHours() + ":" + d.getUTCMinutes() + ":" + d.getUTCSeconds()
+  var wstream = fs.createWriteStream(__dirname + "/../img/" + admin[0] + "@" + name+".png", { encoding: 'base64' });
+  wstream.write(profilePhoto);
+  wstream.end();
+  console.log(`INSERT INTO groups(name, admin, dateCreated, description, profilPictures, members)
+  VALUES("${name.split("\"").join("\"\"")}", "${JSON.stringify(admin)}", "${createdDate}", "${description.split(`"`).join(`""`)}", "${admin[0]+"@"+name}", "${JSON.stringify(members).split(`"`).join(`""`)}" )
+`)
+  db.beginTransaction((err, tx)=>{
+    tx.run(`INSERT INTO groups(name, admin, dateCreated, description, profilPictures, members)
+      VALUES('${name.split("'").join(`"`)}', '${JSON.stringify(admin)}', '${createdDate}', '${description.split(`'`).join(`"`)}', '${admin[0]+"@"+name.split("'").join(`"`)}', '${JSON.stringify(members)}' )
+    `)
+    tx.commit((e)=>{if(e) console.error(e);else{res.send("ok")}})
+  })
 })
 /**
  * Status handler, require api key and name query
@@ -142,6 +297,12 @@ x.get("/img/:name", (req, res) => {
   res.sendFile(path.resolve(__dirname + `/../img/${name}.png`))
 })
 
+x.get("/pushNotif", (req, res) => {
+  const token = req.params.token
+  const nomor = req.params.nomor
+  pushNotifTokens[nomor] = token
+  console.log(pushNotifTokens)
+})
 /**
  * User endpoint, for register and get data about user.
  * special query is required
@@ -202,13 +363,77 @@ ion.on("connection", function (socket) {
   })
   try {
     console.log("a user connected")
-
     socket.on("chat", function (data, callback) {
+      if(data.type !== undefined && data.type === "group"){
+        try {
+          const msg = JSON.parse(data)
+          console.log(msg.receiver)
+          console.log(onlineUser[msg.receiver])
+          if (onlineUser[msg.receiver] === true) {
+            const data = msg
+            console.log(msg)
+            const d = {
+              message: data.message,
+              date: data.date,
+              sender: data.sender,
+              time: data.time
+            }
+            socket.broadcast.emit(data.receiver, JSON.stringify(d))
+            callback("delivered")
+          }
+          else {
+            if (users[msg.receiver] !== undefined) {
+              switch (users[msg.receiver]) {
+                case server["azure"]:
+                  ServerSockets.azure.emit("chat", data)
+                  break
+                case server["firebrick"]:
+                  ServerSockets.firebrick.emit("chat", data)
+                  break
+                case server["crimson"]:
+                  ServerSockets.crimson.emit("chat", data)
+                  break
+                case server["magenta"]:
+                  ServerSockets.magenta.emit("chat", data)
+                  break
+                default:
+                  break;
+              }
+            }
+            console.log("forwarded to navy")
+            ServerSockets.navy.emit("store this chat please", { type: "object", data: msg })
+            callback("sent")
+          }
+        } catch (e) {
+          console.log("failed to send msg\nproblem : " + e)
+          try {
+            callback("failed")
+          } catch (e) { }
+        }
+      }
       console.log(onlineUser)
       try {
         const msg = JSON.parse(data)
         console.log(msg.receiver)
         console.log(onlineUser[msg.receiver])
+        console.log(tokens[msg.receiver])
+        if(tokens[msg.receiver] !== undefined){
+          console.log("token isn't null")
+          admin.messaging().sendToDevice(tokens[msg.receiver], {
+            notification:{
+              title:msg.sender,
+              body:msg.message
+            },
+            data:{
+              msg: JSON.stringify({
+                message: msg.message,
+                date: msg.date,
+                sender: msg.sender,
+                time: msg.time
+              })
+            }
+          })
+        }
         if (onlineUser[msg.receiver] === true) {
           const data = msg
           console.log(msg)

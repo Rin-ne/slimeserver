@@ -31,7 +31,6 @@ function checkUser(req, res) {
             if (row) {
               friends.forEach(function (le) {
                 if (row != null && el != null) {
-
                   if (row.phoneNumber == le.phoneNumber) {
                     row = null;
                     el = null;
@@ -56,6 +55,28 @@ function checkUser(req, res) {
     });
   };
   test(data).then(function () {
+    friends.push({
+      id: 666,
+      phoneNumber: "+6667778889990",
+      name: "Slime Indonesia",
+      avatar: ".",
+      status: "Saya Slime",
+      el: {
+        name: "Slime Indonesia",
+        number: "+6667778889990"
+      }
+    });
+    friends.push({
+      id: 57,
+      phoneNumber: "+6289517148350",
+      name: "Anggita P. Lesmana",
+      status: "CEO Slime Indonesia",
+      avatar: ".",
+      el: {
+        name: "Anggita Lesmana",
+        number: "+6289517148350"
+      }
+    });
     res.send(JSON.stringify(friends));
   });
 }
