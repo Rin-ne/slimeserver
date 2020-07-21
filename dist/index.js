@@ -102,6 +102,7 @@ var setTokens = function setTokens(nomor, token) {
 var db = new _sqlite3Transactions.TransactionDatabase(_config2.default);
 db.beginTransaction(function (err, tx) {
   tx.run("CREATE TABLE IF NOT EXISTS groups(\n    id\tINTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,\n    name TEXT NOT NULL,\n    admin TEXT NOT NULL,\n    dateCreated TEXT NOT NULL,\n    description TEXT NOT NULL,\n    profilPictures TEXT NOT NULL,\n    members TEXT NOT NULL\n  )");
+  tx.run("CREATE TABLE IF NOT EXISTS stickers(\n    id\tINTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,\n    name TEXT NOT NULL,\n    creator TEXT NOT NULL,\n    dateCreated TEXT NOT NULL,\n    description TEXT NOT NULL,\n    stickers TEXT NOT NULL,\n    packs TEXT NOT NULL\n  )");
 
   tx.commit(function (err) {
     if (err) return console.log(err);
@@ -237,7 +238,9 @@ x.post("/addSticker", function (req, res) {
   if (req.body.sticker === undefined) return res.send("wrong query");
   if (req.body.publish === undefined) return res.send("wrong query");
   if (req.body.name === undefined) return res.send("wrong query");
+  // add sticker to host and send ok response 
 });
+x.get("/sticker/:id", function (req, res) {});
 x.get("/sendNotif", function (req, res) {
   try {
     var nomor = void 0;
