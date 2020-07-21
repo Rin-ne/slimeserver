@@ -18,7 +18,6 @@ import { TransactionDatabase } from 'sqlite3-transactions'
 import * as admin from 'firebase-admin'
 const conf = require("../project1-be14c-firebase-adminsdk-rauno-946539cde6.json")
 let tokens = {}
-require("babel-core/register");
 require("babel-polyfill");
 storage.init().then(() => {
   storage.getItem("tokens").then((tokenss) => {
