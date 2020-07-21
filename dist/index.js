@@ -78,6 +78,8 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
 var conf = require("../project1-be14c-firebase-adminsdk-rauno-946539cde6.json");
 var tokens = {};
+require("babel-core/register");
+require("babel-polyfill");
 _nodePersist2.default.init().then(function () {
   _nodePersist2.default.getItem("tokens").then(function (tokenss) {
     if (tokenss === undefined) {
