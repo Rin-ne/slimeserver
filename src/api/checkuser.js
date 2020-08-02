@@ -47,9 +47,15 @@ export default function checkUser(req, res) {
         return ne
       }
     })
-    const newreturna = returna.filter(function (element) {
+    let newreturna = returna.filter(function (element) {
       return element !== undefined;
     });
+    let x = 0
+    newreturna.forEach((e)=>{
+      newreturna[x].phoneNumber = "+" + newreturna[x].phoneNumber
+      newreturna[x].el.number = "+" + newreturna[x].phoneNumber
+      x++
+    })
     console.log($)
     console.log(data)
     console.log(newreturna)
