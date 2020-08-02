@@ -30,7 +30,7 @@ export default function checkUser(req, res) {
       console.log(dat)
       $.forEach(($$) => {
         console.log($$.phoneNumber)
-        dat.number = "+" + dat.number
+        $$.phoneNumber = "+" + $$.phoneNumber
         if (dat.number === $$.phoneNumber) {
           ne = {
             id: 0,
