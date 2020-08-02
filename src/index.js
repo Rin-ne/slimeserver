@@ -16,8 +16,22 @@ import io from 'socket.io-client'
 import sql from './db/config'
 import { TransactionDatabase } from 'sqlite3-transactions'
 import * as admin from 'firebase-admin'
+import * as firebase from 'firebase/app'
+import 'firebase/storage'
 const conf = require("../project1-be14c-firebase-adminsdk-rauno-946539cde6.json")
 let tokens = {}
+var firebaseConfig = {
+  apiKey: "AIzaSyCsN19XsPqpXQFMMtRq8BlM81Ccs94ztb0",
+  authDomain: "project1-be14c.firebaseapp.com",
+  databaseURL: "https://project1-be14c.firebaseio.com",
+  projectId: "project1-be14c",
+  storageBucket: "project1-be14c.appspot.com",
+  messagingSenderId: "249400189524",
+  appId: "1:249400189524:web:6e30ebb2682965b38803c1",
+  measurementId: "G-K0TTF0JMC8"
+};
+
+firebase.initializeApp(firebaseConfig)
 require("babel-polyfill");
 storage.init().then(() => {
   storage.getItem("tokens").then((tokenss) => {
@@ -289,6 +303,7 @@ x.get("/status/:name", (req, res) => {
 x.post("/status", (req, res) => {
 
 })
+// nothing
 /**
  * img handler. img received from /user post endpoint or daftar activity
  * no apikey is required. but the access will be limited soon.
