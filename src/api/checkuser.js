@@ -10,28 +10,23 @@ export default function checkUser(req, res) {
     }
     if (!Array.isArray(data)) res.send("404")
     let friends = []
-    const $ = users.docs.map((user) => {
+    const $_asw = users.docs.map((user) => {
       return user.data()
     })
+    let $ = {}
+    $_asw.forEach(($$) => {
+      $[$$.phoneNumber] = $$
+    })
 
-    $.sort((a, b) => {
-      a.phoneNumber = a.phoneNumber.replace("+", "")
-      b.phoneNumber = b.phoneNumber.replace("+", "")
-      return Number.parseInt(a.phoneNumber) - Number.parseInt(b.phoneNumber)
-    })
-    data.sort((a, b) => {
-      a.number = a.number.replace("+", "")
-      b.number = b.number.replace("+", "")
-      return Number.parseInt(a.number) - Number.parseInt(b.number)
-    })
     let x = 0
-    const returna = data.map((dat) => {
-      let ne
-      console.log(dat)
-      $.forEach(($$) => {
-        console.log($$.phoneNumber)
 
-        if (dat.number === $$.phoneNumber) {
+    const returna = data.map((dat) => {
+      try {
+
+        let ne
+        console.log(dat)
+        if ($[dat.number] !== undefined) {
+          const $$ = $[dat.number]
           ne = {
             id: 0,
             phoneNumber: $$.phoneNumber,
@@ -40,24 +35,18 @@ export default function checkUser(req, res) {
             avatar: ".",
             el: dat
           }
-          x++
         }
-      })
-      if (ne !== undefined) {
-        return ne
+        if (ne !== undefined) {
+          return ne
+        }
+      } catch (e) {
+        console.log(e)
       }
     })
     let newreturna = returna.filter(function (element) {
       return element !== undefined;
     });
-    {
-      let x = 0
-      newreturna.forEach((e) => {
-        newreturna[x].phoneNumber = "+" + newreturna[x].phoneNumber
-        newreturna[x].el.number = "+" + newreturna[x].el.number
-        x++
-      })
-    }
+    
     console.log($)
     console.log(data)
     console.log(newreturna)
