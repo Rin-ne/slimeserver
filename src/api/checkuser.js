@@ -54,7 +54,7 @@ export default function checkUser(req, res) {
       let x = 0
       newreturna.forEach((e) => {
         newreturna[x].phoneNumber = "+" + newreturna[x].phoneNumber
-        newreturna[x].el.number = "+" + newreturna[x].phoneNumber
+        newreturna[x].el.number = "+" + newreturna[x].el.number
         x++
       })
     }
