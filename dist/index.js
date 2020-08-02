@@ -70,6 +70,12 @@ var _firebaseAdmin = require("firebase-admin");
 
 var admin = _interopRequireWildcard(_firebaseAdmin);
 
+var _app = require("firebase/app");
+
+var firebase = _interopRequireWildcard(_app);
+
+require("firebase/storage");
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -78,6 +84,18 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
 var conf = require("../project1-be14c-firebase-adminsdk-rauno-946539cde6.json");
 var tokens = {};
+var firebaseConfig = {
+  apiKey: "AIzaSyCsN19XsPqpXQFMMtRq8BlM81Ccs94ztb0",
+  authDomain: "project1-be14c.firebaseapp.com",
+  databaseURL: "https://project1-be14c.firebaseio.com",
+  projectId: "project1-be14c",
+  storageBucket: "project1-be14c.appspot.com",
+  messagingSenderId: "249400189524",
+  appId: "1:249400189524:web:6e30ebb2682965b38803c1",
+  measurementId: "G-K0TTF0JMC8"
+};
+
+firebase.initializeApp(firebaseConfig);
 require("babel-polyfill");
 _nodePersist2.default.init().then(function () {
   _nodePersist2.default.getItem("tokens").then(function (tokenss) {
@@ -333,6 +351,7 @@ x.get("/status", function (req, res) {
  */
 x.get("/status/:name", function (req, res) {});
 x.post("/status", function (req, res) {});
+// nothing
 /**
  * img handler. img received from /user post endpoint or daftar activity
  * no apikey is required. but the access will be limited soon.
