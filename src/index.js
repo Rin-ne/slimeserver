@@ -124,7 +124,7 @@ setInterval(() => {
       users = data
     })
     .catch(e => { })
-}, 10)
+}, 10000)
 let x = express()
 let http = require("http").createServer(x)
 let ion = require("socket.io")(http, { wsEngine: "ws" })
@@ -187,32 +187,32 @@ x.post("/addSticker", (req, res) => {
 x.get("/sticker/:id", (req, res) => {
   
 })
-x.get("/sendNotif", (req, res) => {
-  try {
-    let nomor
-    nomor = req.query.nomor
-    console.log(tokens[nomor])
-    admin.messaging().sendToDevice(
-      tokens[nomor],
-      {
-        data: {
-          nomor: nomor
-        },
-      },
-      {
-        // Required for background/quit data-only messages on iOS
-        contentAvailable: true,
-        // Required for background/quit data-only messages on Android
-        priority: 'high',
-      },
-    ).then(()=>{
-      res.send("ok")
-    })
-  } catch (e) {
-    console.log(e)
-    return res.send("Wrong Query")
-  }
-})
+// x.get("/sendNotif", (req, res) => {
+//   try {
+//     let nomor
+//     nomor = req.query.nomor
+//     console.log(tokens[nomor])
+//     admin.messaging().sendToDevice(
+//       tokens[nomor],
+//       {
+//         data: {
+//           nomor: nomor
+//         },
+//       },
+//       {
+//         // Required for background/quit data-only messages on iOS
+//         contentAvailable: true,
+//         // Required for background/quit data-only messages on Android
+//         priority: 'high',
+//       },
+//     ).then(()=>{
+//       res.send("ok")
+//     })
+//   } catch (e) {
+//     console.log(e)
+//     return res.send("Wrong Query")
+//   }
+// })
 
 x.all("/", (req, res) => {
   res.send("Slimechat API V.0.2 Beta --- NO DIRECT ACCESS ALLOWED")
@@ -363,6 +363,39 @@ ion.on("connection", function (socket) {
     clearTimeout(bomb)
   })
   try {
+    socket.on("inviteTo", (data, cb)=>{
+      if(
+        data.target === undefined||
+        data.date === undefined||
+        data.group === undefined||
+        data.inviter === undefined
+      ){
+        cb("", "OPERATION NOT ALLOWED")
+        return
+      }
+      if(Array.isArray(data.target)){
+        data.target.map((target)=>{
+          if(onlineUser[target]){
+            socket.broadcast.emit("inv@"+target, data)
+            if(tokens[target] !== undefined){
+              console.log("token isn't null")
+              admin.messaging().sendToDevice(tokens[target], {
+                notification:{
+                  title:data.group,
+                  body:`${data.inviter} invite you to ${data.group}`
+                },
+                data:{
+                  type:"invitation"
+                }
+              })
+            }
+          }
+          else{
+            
+          }
+        })
+      }
+    })
     console.log("a user connected")
     socket.on("chat", function (data, callback) {
       if(data.type !== undefined && data.type === "group"){
