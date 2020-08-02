@@ -30,7 +30,7 @@ export default function checkUser(req, res) {
       console.log(dat)
       $.forEach(($$) => {
         console.log($$.phoneNumber)
-        
+
         if (dat.number === $$.phoneNumber) {
           ne = {
             id: 0,
@@ -50,12 +50,14 @@ export default function checkUser(req, res) {
     let newreturna = returna.filter(function (element) {
       return element !== undefined;
     });
-    let x = 0
-    newreturna.forEach((e)=>{
-      newreturna[x].phoneNumber = "+" + newreturna[x].phoneNumber
-      newreturna[x].el.number = "+" + newreturna[x].phoneNumber
-      x++
-    })
+    {
+      let x = 0
+      newreturna.forEach((e) => {
+        newreturna[x].phoneNumber = "+" + newreturna[x].phoneNumber
+        newreturna[x].el.number = "+" + newreturna[x].phoneNumber
+        x++
+      })
+    }
     console.log($)
     console.log(data)
     console.log(newreturna)
