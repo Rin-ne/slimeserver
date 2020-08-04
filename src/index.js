@@ -98,6 +98,9 @@ db.serialize(() => {
   db.run
 })
 
+let lastSeen = {
+  "+6285710251303":"hidden"
+}
 const server = {
   "azure": "http://sl-azure.herokuapp.com",
   "crimson": "http://sl-crimson.herokuapp.com",
@@ -197,6 +200,12 @@ x.post("/addSticker", (req, res) => {
   if(req.body.name === undefined) return res.send("wrong query")
  // add sticker to host and send ok response 
 
+})
+x.post("/lastseen/:name", (r, q)=>{
+  const name = r.params.name
+  const d = new Date()
+  lastSeen[name] = d.toUTCString()
+  r.status(200).send("ok")
 })
 x.get("/sticker/:id", (req, res) => {
   
@@ -342,6 +351,7 @@ x.post("/user", usersPost)
 x.get("/test", (req, res) => {
   res.sendFile(__dirname + "/index.html")
 })
+
 let numberOFConnectedClient = 0
 let onlineUser = {}
 let clientData = {}
@@ -367,6 +377,28 @@ ion.on("connection", function (socket) {
     } catch (e) {
       console.log("disconnect faily")
     }
+  })
+  socket.on("send", (data, callbak)=>{
+    const sender = data.sender
+    const receiver = data.receiver
+    const msg = data.msg
+    const date = data.date
+    const time = data.time
+    admin.messaging().sendToDevice(tokens[msg.receiver], {
+      notification:{
+        title:sender,
+        body:message
+      },
+      data:{
+        msg: JSON.stringify({
+          message: message,
+          date: date,
+          sender: sender,
+          time: time,
+          receiver
+        })
+      }
+    })
   })
   socket.on("username", (username) => {
     clientData[socket.id] = {
