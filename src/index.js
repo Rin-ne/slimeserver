@@ -204,7 +204,7 @@ x.post("/addSticker", (req, res) => {
 x.post("/send", (req, res) => {
   const sender = req.body.sender
   const receiver = req.body.receiver
-  const msg = req.body.msg
+  const message = req.body.msg
   const date = req.body.date
   const time = req.body.time
   admin.messaging().sendToDevice(tokens[receiver], {
