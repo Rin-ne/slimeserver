@@ -35,7 +35,7 @@ firebase.initializeApp(firebaseConfig)
 require("babel-polyfill");
 storage.init().then(() => {
   storage.getItem("tokens").then((tokenss) => {
-    if(tokenss === undefined){
+    if (tokenss === undefined) {
       console.log("empty tokens")
       return
     }
@@ -46,12 +46,12 @@ storage.init().then(() => {
 
 
 const setTokens = (nomor, token) => {
-  try{
+  try {
 
     tokens[nomor] = token
     storage.setItem("tokens", JSON.stringify(tokens))
     console.log(tokens)
-  }catch(e){
+  } catch (e) {
     console.log("something wrong happened, or token is already in server")
   }
 }
@@ -66,7 +66,7 @@ db.beginTransaction((err, tx) => {
     profilPictures TEXT NOT NULL,
     members TEXT NOT NULL
   )`)
-   tx.run(`CREATE TABLE IF NOT EXISTS stickers(
+  tx.run(`CREATE TABLE IF NOT EXISTS stickers(
     id	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
     name TEXT NOT NULL,
     creator TEXT NOT NULL,
@@ -82,9 +82,9 @@ db.beginTransaction((err, tx) => {
   })
 })
 
-const getGroupInfo = async()=>{
-  return sql.serialize(()=>{
-    return sql.all(`SELECT * FROM groups`, [], (err, rows)=>{
+const getGroupInfo = async () => {
+  return sql.serialize(() => {
+    return sql.all(`SELECT * FROM groups`, [], (err, rows) => {
       return rows
     })
   })
@@ -99,7 +99,7 @@ db.serialize(() => {
 })
 
 let lastSeen = {
-  "+6285710251303":"hidden"
+  "+6285710251303": "hidden"
 }
 const server = {
   "azure": "http://sl-azure.herokuapp.com",
@@ -193,22 +193,44 @@ x.get("/sendToken", (req, res) => {
   res.send("ok")
 })
 x.post("/addSticker", (req, res) => {
-  if(req.body.nomor === undefined) return res.send("wrong query")
-  if(req.body.name === undefined) return res.send("wrong query")
-  if(req.body.sticker === undefined) return res.send("wrong query")
-  if(req.body.publish === undefined) return res.send("wrong query")
-  if(req.body.name === undefined) return res.send("wrong query")
- // add sticker to host and send ok response 
+  if (req.body.nomor === undefined) return res.send("wrong query")
+  if (req.body.name === undefined) return res.send("wrong query")
+  if (req.body.sticker === undefined) return res.send("wrong query")
+  if (req.body.publish === undefined) return res.send("wrong query")
+  if (req.body.name === undefined) return res.send("wrong query")
+  // add sticker to host and send ok response 
 
 })
-x.post("/lastseen/:name", (r, q)=>{
+x.post("/send", (req, res) => {
+  const sender = req.body.sender
+  const receiver = req.body.receiver
+  const msg = req.body.msg
+  const date = req.body.date
+  const time = req.body.time
+  admin.messaging().sendToDevice(tokens[msg.receiver], {
+    notification: {
+      title: sender,
+      body: message
+    },
+    data: {
+      msg: JSON.stringify({
+        message: message,
+        date: date,
+        sender: sender,
+        time: time,
+        receiver
+      })
+    }
+  })
+})
+x.post("/lastseen/:name", (r, q) => {
   const name = r.params.name
   const d = new Date()
   lastSeen[name] = d.toUTCString()
   r.status(200).send("ok")
 })
 x.get("/sticker/:id", (req, res) => {
-  
+
 })
 // x.get("/sendNotif", (req, res) => {
 //   try {
@@ -251,38 +273,38 @@ x.post("/up", (req, res) => {
 x.post("/uploadFile", (req, res) => {
   console.log(req.body)
 })
-const dn = ()=>{}
-x.post("/group", (req, res)=>{
-  if(
-    req.body.name === undefined||
-    req.body.admin === undefined||
-    req.body.profilePhoto === undefined||
-    req.body.members === undefined||
+const dn = () => { }
+x.post("/group", (req, res) => {
+  if (
+    req.body.name === undefined ||
+    req.body.admin === undefined ||
+    req.body.profilePhoto === undefined ||
+    req.body.members === undefined ||
     req.body.description === undefined
-  ){
+  ) {
     return res.send("Wrong Query")
   }
-  if(typeof req.body.admin == "string"){
+  if (typeof req.body.admin == "string") {
     req.body.admin = JSON.parse(req.body.admin)
   }
   const name = req.body.name,
-        admin = req.body.admin,
-        profilePhoto = req.body.profilePhoto,
-        members = req.body.members,
-        description = req.body.description,
-        d = new Date(),
-        createdDate = d.getUTCFullYear() + "-" + d.getUTCMonth() + "-" + d.getUTCDate() + " " + d.getUTCHours() + ":" + d.getUTCMinutes() + ":" + d.getUTCSeconds()
-  var wstream = fs.createWriteStream(__dirname + "/../img/" + admin[0] + "@" + name+".png", { encoding: 'base64' });
+    admin = req.body.admin,
+    profilePhoto = req.body.profilePhoto,
+    members = req.body.members,
+    description = req.body.description,
+    d = new Date(),
+    createdDate = d.getUTCFullYear() + "-" + d.getUTCMonth() + "-" + d.getUTCDate() + " " + d.getUTCHours() + ":" + d.getUTCMinutes() + ":" + d.getUTCSeconds()
+  var wstream = fs.createWriteStream(__dirname + "/../img/" + admin[0] + "@" + name + ".png", { encoding: 'base64' });
   wstream.write(profilePhoto);
   wstream.end();
   console.log(`INSERT INTO groups(name, admin, dateCreated, description, profilPictures, members)
-  VALUES("${name.split("\"").join("\"\"")}", "${JSON.stringify(admin)}", "${createdDate}", "${description.split(`"`).join(`""`)}", "${admin[0]+"@"+name}", "${JSON.stringify(members).split(`"`).join(`""`)}" )
+  VALUES("${name.split("\"").join("\"\"")}", "${JSON.stringify(admin)}", "${createdDate}", "${description.split(`"`).join(`""`)}", "${admin[0] + "@" + name}", "${JSON.stringify(members).split(`"`).join(`""`)}" )
 `)
-  db.beginTransaction((err, tx)=>{
+  db.beginTransaction((err, tx) => {
     tx.run(`INSERT INTO groups(name, admin, dateCreated, description, profilPictures, members)
-      VALUES('${name.split("'").join(`"`)}', '${JSON.stringify(admin)}', '${createdDate}', '${description.split(`'`).join(`"`)}', '${admin[0]+"@"+name.split("'").join(`"`)}', '${JSON.stringify(members)}' )
+      VALUES('${name.split("'").join(`"`)}', '${JSON.stringify(admin)}', '${createdDate}', '${description.split(`'`).join(`"`)}', '${admin[0] + "@" + name.split("'").join(`"`)}', '${JSON.stringify(members)}' )
     `)
-    tx.commit((e)=>{if(e) console.error(e);else{res.send("ok")}})
+    tx.commit((e) => { if (e) console.error(e); else { res.send("ok") } })
   })
 })
 /**
@@ -378,28 +400,6 @@ ion.on("connection", function (socket) {
       console.log("disconnect faily")
     }
   })
-  socket.on("send", (data, callbak)=>{
-    const sender = data.sender
-    const receiver = data.receiver
-    const msg = data.msg
-    const date = data.date
-    const time = data.time
-    admin.messaging().sendToDevice(tokens[msg.receiver], {
-      notification:{
-        title:sender,
-        body:message
-      },
-      data:{
-        msg: JSON.stringify({
-          message: message,
-          date: date,
-          sender: sender,
-          time: time,
-          receiver
-        })
-      }
-    })
-  })
   socket.on("username", (username) => {
     clientData[socket.id] = {
       username: username,
@@ -410,42 +410,42 @@ ion.on("connection", function (socket) {
     clearTimeout(bomb)
   })
   try {
-    socket.on("inviteTo", (data, cb)=>{
-      if(
-        data.target === undefined||
-        data.date === undefined||
-        data.group === undefined||
+    socket.on("inviteTo", (data, cb) => {
+      if (
+        data.target === undefined ||
+        data.date === undefined ||
+        data.group === undefined ||
         data.inviter === undefined
-      ){
+      ) {
         cb("", "OPERATION NOT ALLOWED")
         return
       }
-      if(Array.isArray(data.target)){
-        data.target.map((target)=>{
-          if(onlineUser[target]){
-            socket.broadcast.emit("inv@"+target, data)
-            if(tokens[target] !== undefined){
+      if (Array.isArray(data.target)) {
+        data.target.map((target) => {
+          if (onlineUser[target]) {
+            socket.broadcast.emit("inv@" + target, data)
+            if (tokens[target] !== undefined) {
               console.log("token isn't null")
               admin.messaging().sendToDevice(tokens[target], {
-                notification:{
-                  title:data.group,
-                  body:`${data.inviter} invite you to ${data.group}`
+                notification: {
+                  title: data.group,
+                  body: `${data.inviter} invite you to ${data.group}`
                 },
-                data:{
-                  type:"invitation"
+                data: {
+                  type: "invitation"
                 }
               })
             }
           }
-          else{
-            
+          else {
+
           }
         })
       }
     })
     console.log("a user connected")
     socket.on("chat", function (data, callback) {
-      if(data.type !== undefined && data.type === "group"){
+      if (data.type !== undefined && data.type === "group") {
         try {
           const msg = JSON.parse(data)
           console.log(msg.receiver)
@@ -498,14 +498,14 @@ ion.on("connection", function (socket) {
         console.log(msg.receiver)
         console.log(onlineUser[msg.receiver])
         console.log(tokens[msg.receiver])
-        if(tokens[msg.receiver] !== undefined){
+        if (tokens[msg.receiver] !== undefined) {
           console.log("token isn't null")
           admin.messaging().sendToDevice(tokens[msg.receiver], {
-            notification:{
-              title:msg.sender,
-              body:msg.message
+            notification: {
+              title: msg.sender,
+              body: msg.message
             },
-            data:{
+            data: {
               msg: JSON.stringify({
                 message: msg.message,
                 date: msg.date,
