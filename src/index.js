@@ -207,7 +207,7 @@ x.post("/send", (req, res) => {
   const msg = req.body.msg
   const date = req.body.date
   const time = req.body.time
-  admin.messaging().sendToDevice(tokens[msg.receiver], {
+  admin.messaging().sendToDevice(tokens[receiver], {
     notification: {
       title: sender,
       body: message
