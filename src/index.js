@@ -208,6 +208,7 @@ x.post("/send", (req, res) => {
   const date = req.body.date
   const time = req.body.time
   console.log(tokens)
+  console.log(tokens[receiver])
   admin.messaging().sendToDevice(tokens[receiver], {
     notification: {
       title: sender,
